@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{{ nombre_proyecto }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+  <aside class="barra-lateral">
+    <div class="marca">
+      <span class="marca__simbolo">CC</span>
+      <div>
+        <strong>{{ nombre_proyecto }}</strong>
+        <small>Web Admin</small>
+      </div>
+    </div>
+    <nav class="menu">
+      <a href="{{ url_for('inicio') }}">Dashboard</a>
+      <a href="{{ url_for('usuarios') }}">Usuarios</a>
+      <a href="{{ url_for('estadisticas') }}">Estadisticas</a>
+      <a href="{{ url_for('reportes') }}">Reportes</a>
+      <a href="{{ url_for('cocina') }}">Cocina</a>
+      <a href="{{ url_for('caja') }}">Caja</a>
+    </nav>
+    <div class="api-estado {{ 'ok' if api_disponible else 'error' }}">
+      API {{ 'conectada' if api_disponible else 'sin conexion' }}
+      <small>{{ api_base_url }}</small>
+    </div>
+  </aside>
+
+  <main class="contenido">
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+      {% if mensajes %}
+        <div class="mensajes">
+          {% for categoria, mensaje in mensajes %}
+            <p class="mensaje {{ categoria }}">{{ mensaje }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

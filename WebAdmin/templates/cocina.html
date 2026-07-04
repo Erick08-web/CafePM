@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block titulo %}Cocina - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado">
+  <div>
+    <p class="eyebrow">Modulo cocina</p>
+    <h1>Pedidos e inventario</h1>
+  </div>
+</header>
+
+<section class="grid-dos">
+  <div class="panel">
+    <h2>Pedidos pendientes</h2>
+    {% for pedido in pedidos %}
+    <div class="pedido">
+      <strong>Pedido #{{ pedido.id_pedido }} - Mesa {{ pedido.numero_mesa }}</strong>
+      <span>{{ pedido.estado }} · ${{ '%.2f'|format(pedido.total or 0) }}</span>
+      <ul>
+        {% for item in pedido.detalle %}
+        <li>{{ item.cantidad }} x {{ item.nombre }}{% if item.observaciones %} - {{ item.observaciones }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <p>No hay pedidos pendientes.</p>
+    {% endfor %}
+  </div>
+  <div class="panel">
+    <h2>Inventario bajo</h2>
+    <table>
+      <thead><tr><th>Insumo</th><th>Stock</th><th>Minimo</th></tr></thead>
+      <tbody>
+        {% for item in inventario_bajo %}
+        <tr><td>{{ item.nombre }}</td><td>{{ item.stock_actual }} {{ item.unidad_medida }}</td><td>{{ item.stock_minimo }}</td></tr>
+        {% else %}
+        <tr><td colspan="3">Inventario en niveles correctos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

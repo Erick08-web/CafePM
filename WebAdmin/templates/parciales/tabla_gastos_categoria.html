@@ -1,0 +1,10 @@
+<table>
+  <thead><tr><th>Categoria</th><th>Total</th></tr></thead>
+  <tbody>
+    {% for gasto in gastos %}
+    <tr><td>{{ gasto.categoria }}</td><td>${{ '%.2f'|format(gasto.total or 0) }}</td></tr>
+    {% else %}
+    <tr><td colspan="2">Sin gastos por categoria.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

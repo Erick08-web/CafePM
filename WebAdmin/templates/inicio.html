@@ -1,15 +1,40 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ nombre_proyecto }} - Web Admin</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
-</head>
-<body>
-  <main class="contenedor">
-    <h1>{{ nombre_proyecto }}</h1>
-    <p>Panel web administrativo para usuarios, roles, estadisticas y reportes.</p>
-  </main>
-</body>
-</html>
+{% extends "base.html" %}
+{% block titulo %}Dashboard - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado">
+  <div>
+    <p class="eyebrow">Panel administrativo</p>
+    <h1>Dashboard</h1>
+  </div>
+</header>
+
+<section class="metricas">
+  <article>
+    <span>Ingresos</span>
+    <strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong>
+  </article>
+  <article>
+    <span>Gastos</span>
+    <strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong>
+  </article>
+  <article>
+    <span>Compras</span>
+    <strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong>
+  </article>
+  <article>
+    <span>Ganancia estimada</span>
+    <strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong>
+  </article>
+</section>
+
+<section class="grid-dos">
+  <div class="panel">
+    <h2>Productos mas vendidos</h2>
+    {% include "parciales/tabla_productos_vendidos.html" %}
+  </div>
+  <div class="panel">
+    <h2>Pedidos por estado</h2>
+    {% include "parciales/tabla_pedidos_estado.html" %}
+  </div>
+</section>
+{% endblock %}

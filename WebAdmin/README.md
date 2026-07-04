@@ -1,17 +1,39 @@
 # WebAdmin
 
-Aplicacion web administrativa solicitada en la entrega.
+Aplicacion web administrativa de Coffee Code construida con Flask.
 
-Tecnologia indicada por la documentacion:
+## Modulos incluidos
 
-- Flask
-- Python
-- Consumo de la API Backend
+- Dashboard con resumen financiero.
+- Gestion de usuarios y roles.
+- Alta de usuarios con permisos por modulo.
+- Estadisticas de gastos, ganancias, productos vendidos y pedidos.
+- Reportes de pedidos, inventario y productos.
+- Vistas de apoyo para Cocina y Caja.
 
-## Modulos esperados
+## Requisitos
 
-- Login administrativo.
-- CRUD de usuarios.
-- Asignacion de roles y permisos.
-- Estadisticas: gastos, ganancias y productos.
-- Reportes filtrados en PDF y XLSX.
+La API debe estar corriendo en `http://localhost:8000` y PostgreSQL debe estar activo con Docker.
+
+```bash
+cd ApiBackend
+source .venv/bin/activate
+uvicorn app.main:app --reload
+```
+
+En otra terminal:
+
+```bash
+cd WebAdmin
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+Variables opcionales:
+
+```env
+FLASK_SECRET_KEY=replace-with-a-secret-key
+API_BASE_URL=http://localhost:8000
+```

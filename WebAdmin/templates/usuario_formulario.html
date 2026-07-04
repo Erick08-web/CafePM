@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo usuario - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado">
+  <div>
+    <p class="eyebrow">Usuarios y roles</p>
+    <h1>Nuevo usuario</h1>
+  </div>
+</header>
+
+<form class="formulario" method="post">
+  <label>
+    Nombre
+    <input name="nombre" required maxlength="100">
+  </label>
+  <label>
+    Correo
+    <input name="correo" type="email" required maxlength="100">
+  </label>
+  <label>
+    Password
+    <input name="password" type="password" required>
+  </label>
+  <label>
+    Rol
+    <select name="id_rol" required>
+      {% for rol in roles %}
+      <option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <fieldset>
+    <legend>Permisos por modulo</legend>
+    <div class="checks">
+      {% for permiso in permisos %}
+      <label>
+        <input type="checkbox" name="permisos" value="{{ permiso.id_permiso }}">
+        {{ permiso.nombre }}
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <div class="acciones-formulario">
+    <a class="boton secundario" href="{{ url_for('usuarios') }}">Cancelar</a>
+    <button class="boton" type="submit">Crear usuario</button>
+  </div>
+</form>
+{% endblock %}

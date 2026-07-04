@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Reportes - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado acciones">
+  <div>
+    <p class="eyebrow">Reportes</p>
+    <h1>Reportes filtrados</h1>
+  </div>
+  <div class="segmentos">
+    <a class="{{ 'activo' if tipo == 'pedidos' else '' }}" href="{{ url_for('reportes', tipo='pedidos') }}">Pedidos</a>
+    <a class="{{ 'activo' if tipo == 'inventario' else '' }}" href="{{ url_for('reportes', tipo='inventario') }}">Inventario</a>
+    <a class="{{ 'activo' if tipo == 'productos' else '' }}" href="{{ url_for('reportes', tipo='productos') }}">Productos</a>
+  </div>
+</header>
+
+<div class="panel tabla-scroll">
+  {% if datos %}
+  <table>
+    <thead>
+      <tr>
+        {% for columna in datos[0].keys() %}
+        <th>{{ columna }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for fila in datos %}
+      <tr>
+        {% for valor in fila.values() %}
+        <td>{{ valor }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No hay datos disponibles para este reporte.</p>
+  {% endif %}
+</div>
+{% endblock %}

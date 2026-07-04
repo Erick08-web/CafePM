@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Usuarios - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado acciones">
+  <div>
+    <p class="eyebrow">Usuarios y roles</p>
+    <h1>Gestion de usuarios</h1>
+  </div>
+  <a class="boton" href="{{ url_for('usuario_nuevo') }}">Nuevo usuario</a>
+</header>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in usuarios %}
+      <tr>
+        <td>{{ usuario.id_usuario }}</td>
+        <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.correo }}</td>
+        <td>{{ usuario.rol }}</td>
+        <td><span class="estado {{ 'ok' if usuario.activo else 'error' }}">{{ 'Activo' if usuario.activo else 'Inactivo' }}</span></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No hay usuarios para mostrar.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

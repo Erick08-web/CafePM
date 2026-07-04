@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Estadisticas - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado">
+  <div>
+    <p class="eyebrow">Estadisticas</p>
+    <h1>Gastos, ganancias y productos</h1>
+  </div>
+</header>
+
+<section class="metricas">
+  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong></article>
+  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong></article>
+  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong></article>
+  <article><span>Ganancia estimada</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong></article>
+</section>
+
+<section class="grid-dos">
+  <div class="panel">
+    <h2>Productos mas vendidos</h2>
+    {% include "parciales/tabla_productos_vendidos.html" %}
+  </div>
+  <div class="panel">
+    <h2>Gastos por categoria</h2>
+    {% include "parciales/tabla_gastos_categoria.html" %}
+  </div>
+</section>
+{% endblock %}

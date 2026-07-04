@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titulo %}Caja - {{ nombre_proyecto }}{% endblock %}
+{% block contenido %}
+<header class="encabezado">
+  <div>
+    <p class="eyebrow">Modulo caja</p>
+    <h1>Cuentas, gastos y compras</h1>
+  </div>
+</header>
+
+<section class="metricas">
+  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong></article>
+  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong></article>
+  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong></article>
+  <article><span>Ganancia</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong></article>
+</section>
+
+<section class="grid-dos">
+  <div class="panel">
+    <h2>Cuentas pendientes</h2>
+    <table>
+      <thead><tr><th>Pedido</th><th>Mesa</th><th>Total</th><th>Estado</th></tr></thead>
+      <tbody>
+        {% for cuenta in cuentas %}
+        <tr><td>#{{ cuenta.id_pedido }}</td><td>{{ cuenta.numero_mesa }}</td><td>${{ '%.2f'|format(cuenta.total or 0) }}</td><td>{{ cuenta.estado }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">Sin cuentas pendientes.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <h2>Ultimos gastos</h2>
+    <table>
+      <thead><tr><th>Concepto</th><th>Categoria</th><th>Monto</th></tr></thead>
+      <tbody>
+        {% for gasto in gastos[:5] %}
+        <tr><td>{{ gasto.concepto }}</td><td>{{ gasto.categoria }}</td><td>${{ '%.2f'|format(gasto.monto or 0) }}</td></tr>
+        {% else %}
+        <tr><td colspan="3">Sin gastos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
