@@ -351,3 +351,11 @@ legend {
     display: grid;
   }
 }
+
+
+.acciones-reporte {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}

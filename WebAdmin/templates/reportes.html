@@ -13,6 +13,11 @@
   </div>
 </header>
 
+<div class="acciones-reporte">
+  <a class="boton" href="{{ api_base_url }}/reportes/{{ tipo }}/pdf">Descargar PDF</a>
+  <a class="boton secundario" href="{{ api_base_url }}/reportes/{{ tipo }}/xlsx">Descargar XLSX</a>
+</div>
+
 <div class="panel tabla-scroll">
   {% if datos %}
   <table>
