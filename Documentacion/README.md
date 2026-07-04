@@ -1,11 +1,12 @@
 # Documentacion
 
-Carpeta para evidencias y documentos de entrega.
+Carpeta con documentos de apoyo para entregar y defender el proyecto.
 
-Sugerencias:
+## Archivos
 
-- Guardar aqui la rubrica del segundo parcial.
-- Guardar la entrega del primer parcial.
-- Agregar capturas de Postman.
-- Agregar capturas de la app movil en telefono.
-- Agregar capturas de la web administrativa.
+- `PlanSegundoParcial.md`: interpretacion del alcance y orden de construccion.
+- `GuiaEjecucion.md`: pasos para levantar BD, API, WebAdmin y AppMobil.
+- `ChecklistRubrica.md`: puntos de la rubrica cubiertos.
+- `Endpoints.md`: endpoints principales por modulo.
+- `Evidencias.md`: capturas recomendadas para la entrega.
+- `ComandosGit.md`: commits sugeridos en espanol.
