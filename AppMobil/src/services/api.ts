@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+const API_BASE_URL = "http://192.168.0.108:8000";
 
 export class ApiError extends Error {
   constructor(message: string) {
