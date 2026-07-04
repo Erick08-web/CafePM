@@ -1,16 +1,34 @@
 # AppMobil
 
-Aplicacion movil de Coffee Code.
-
-Tecnologia solicitada:
-
-- React Native
-- Expo
+Aplicacion movil de Coffee Code construida con React Native + Expo.
 
 ## Modulos principales
 
-- Mesero: mesas, crear pedidos y consultar estado.
-- Cocina: pedidos pendientes, cambiar estado y revisar inventario/menu.
-- Caja: cuentas, pagos, gastos y compras.
+- Mesero: mesas y menu activo.
+- Cocina: pedidos pendientes e inventario bajo.
+- Caja: resumen monetario y cuentas pendientes.
 
-La rubrica pide entregar las principales interfaces en telefono. La mejor entrega es que estas pantallas consuman endpoints reales de `ApiBackend`.
+La app consume los endpoints reales de `ApiBackend`.
+
+## Configuracion de API
+
+Por defecto usa:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+```
+
+Si pruebas en un telefono fisico con Expo Go, cambia esa URL por la IP local de tu Mac, por ejemplo:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=http://192.168.1.50:8000
+```
+
+## Ejecutar
+
+```bash
+npm install
+npm start
+```
+
+Despues escanea el QR con Expo Go.
