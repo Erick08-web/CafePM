@@ -1,0 +1,9 @@
+{
+  "expo": {
+    "name": "Coffee Code",
+    "slug": "coffee-code",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light"
+  }
+}

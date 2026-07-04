@@ -1,0 +1,56 @@
+{
+  "info": {
+    "name": "Coffee Code API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/health"
+      }
+    },
+    {
+      "name": "Mesero - Mesas",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/mesero/mesas"
+      }
+    },
+    {
+      "name": "Cocina - Pedidos pendientes",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/cocina/pedidos"
+      }
+    },
+    {
+      "name": "Caja - Cuentas pendientes",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/caja/cuentas"
+      }
+    },
+    {
+      "name": "Admin - Usuarios",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/usuarios"
+      }
+    },
+    {
+      "name": "Admin - Estadisticas",
+      "request": {
+        "method": "GET",
+        "url": "{{api_url}}/estadisticas/resumen"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "api_url",
+      "value": "http://localhost:8000"
+    }
+  ]
+}
