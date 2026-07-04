@@ -1,50 +1,331 @@
 {
   "info": {
     "name": "Coffee Code API",
+    "description": "Coleccion para probar los endpoints principales del segundo parcial: Web Admin, Cocina, Caja y Mesero.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Health",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/health"
-      }
+      "name": "Sistema",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/health"
+          }
+        },
+        {
+          "name": "Health DB",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/health/db"
+          }
+        }
+      ]
     },
     {
-      "name": "Mesero - Mesas",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/mesero/mesas"
-      }
+      "name": "Autenticacion",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"admin@coffeecode.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": "{{api_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Mesero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"mesero@coffeecode.com\",\n  \"password\": \"1234\"\n}"
+            },
+            "url": "{{api_url}}/auth/login"
+          }
+        }
+      ]
     },
     {
-      "name": "Cocina - Pedidos pendientes",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/cocina/pedidos"
-      }
+      "name": "Web Admin - Usuarios y roles",
+      "item": [
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/usuarios"
+          }
+        },
+        {
+          "name": "Obtener usuario",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/usuarios/1"
+          }
+        },
+        {
+          "name": "Listar roles",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/catalogos/roles"
+          }
+        },
+        {
+          "name": "Listar permisos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/catalogos/permisos"
+          }
+        },
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Prueba\",\n  \"correo\": \"prueba@coffeecode.com\",\n  \"password\": \"1234\",\n  \"id_rol\": 2,\n  \"permisos\": [\n    1\n  ]\n}"
+            },
+            "url": "{{api_url}}/usuarios"
+          }
+        }
+      ]
     },
     {
-      "name": "Caja - Cuentas pendientes",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/caja/cuentas"
-      }
+      "name": "Mesero",
+      "item": [
+        {
+          "name": "Listar mesas",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/mesero/mesas"
+          }
+        },
+        {
+          "name": "Listar productos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/mesero/productos"
+          }
+        },
+        {
+          "name": "Crear pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": 1,\n  \"id_mesero\": 2,\n  \"productos\": [\n    {\n      \"id_producto\": 1,\n      \"cantidad\": 2,\n      \"observaciones\": \"Sin azucar\"\n    },\n    {\n      \"id_producto\": 4,\n      \"cantidad\": 1\n    }\n  ]\n}"
+            },
+            "url": "{{api_url}}/mesero/pedidos"
+          }
+        },
+        {
+          "name": "Obtener pedido",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/mesero/pedidos/1"
+          }
+        }
+      ]
     },
     {
-      "name": "Admin - Usuarios",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/usuarios"
-      }
+      "name": "Cocina",
+      "item": [
+        {
+          "name": "Pedidos cocina",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/cocina/pedidos"
+          }
+        },
+        {
+          "name": "Inventario",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/cocina/inventario"
+          }
+        },
+        {
+          "name": "Inventario bajo",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/cocina/inventario-bajo"
+          }
+        },
+        {
+          "name": "Menu",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/cocina/menu"
+          }
+        },
+        {
+          "name": "Actualizar estado pedido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"en_preparacion\"\n}"
+            },
+            "url": "{{api_url}}/cocina/pedidos/1/estado"
+          }
+        }
+      ]
     },
     {
-      "name": "Admin - Estadisticas",
-      "request": {
-        "method": "GET",
-        "url": "{{api_url}}/estadisticas/resumen"
-      }
+      "name": "Caja",
+      "item": [
+        {
+          "name": "Cuentas pendientes",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/caja/cuentas"
+          }
+        },
+        {
+          "name": "Resumen caja",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/caja/resumen"
+          }
+        },
+        {
+          "name": "Gastos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/caja/gastos"
+          }
+        },
+        {
+          "name": "Compras",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/caja/compras"
+          }
+        },
+        {
+          "name": "Registrar pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_pedido\": 1,\n  \"metodo_pago\": \"efectivo\",\n  \"monto\": 140.0\n}"
+            },
+            "url": "{{api_url}}/caja/pagos"
+          }
+        },
+        {
+          "name": "Registrar gasto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_usuario\": 3,\n  \"concepto\": \"Compra de servilletas\",\n  \"id_categoria_gasto\": 4,\n  \"monto\": 120.0\n}"
+            },
+            "url": "{{api_url}}/caja/gastos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Estadisticas y reportes",
+      "item": [
+        {
+          "name": "Resumen financiero",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/estadisticas/resumen"
+          }
+        },
+        {
+          "name": "Productos mas vendidos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/estadisticas/productos-mas-vendidos"
+          }
+        },
+        {
+          "name": "Gastos por categoria",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/estadisticas/gastos-por-categoria"
+          }
+        },
+        {
+          "name": "Pedidos por estado",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/estadisticas/pedidos-por-estado"
+          }
+        },
+        {
+          "name": "Reporte pedidos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/reportes/pedidos"
+          }
+        },
+        {
+          "name": "Reporte inventario",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/reportes/inventario"
+          }
+        },
+        {
+          "name": "Reporte productos",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/reportes/productos"
+          }
+        }
+      ]
     }
   ],
   "variable": [

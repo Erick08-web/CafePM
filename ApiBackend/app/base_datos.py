@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.configuracion import configuracion
@@ -17,3 +17,8 @@ def obtener_sesion():
         yield sesion
     finally:
         sesion.close()
+
+
+def probar_conexion():
+    with engine.connect() as conexion:
+        return conexion.execute(text("SELECT 1")).scalar_one()
