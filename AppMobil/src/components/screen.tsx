@@ -14,19 +14,30 @@ export function Screen({ title, subtitle, refreshing = false, onRefresh, childre
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> : undefined}
+      refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.coral} /> : undefined}
       style={{ flex: 1, backgroundColor: colors.fondo }}
-      contentContainerStyle={{ padding: 18, gap: 16, paddingBottom: 32 }}
+      contentContainerStyle={{ padding: 18, gap: 16, paddingBottom: 34 }}
     >
-      <View style={{ gap: 6 }}>
-        <Text selectable style={{ color: colors.cafe, fontSize: 12, fontWeight: "800", textTransform: "uppercase" }}>
+      <View
+        style={{
+          backgroundColor: colors.superficieMiel,
+          borderColor: colors.borde,
+          borderCurve: "continuous",
+          borderRadius: 24,
+          borderWidth: 1,
+          boxShadow: "0 14px 34px rgba(246, 177, 61, 0.18)",
+          gap: 8,
+          padding: 20,
+        }}
+      >
+        <Text selectable style={{ color: colors.coral, fontSize: 12, fontWeight: "900", textTransform: "uppercase" }}>
           Coffee Code
         </Text>
-        <Text selectable style={{ color: colors.texto, fontSize: 30, fontWeight: "800" }}>
+        <Text selectable style={{ color: colors.texto, fontSize: 34, fontWeight: "900", lineHeight: 38 }}>
           {title}
         </Text>
         {subtitle ? (
-          <Text selectable style={{ color: colors.textoSuave, fontSize: 15, lineHeight: 21 }}>
+          <Text selectable style={{ color: colors.textoSuave, fontSize: 16, lineHeight: 23, fontWeight: "600" }}>
             {subtitle}
           </Text>
         ) : null}

@@ -3,18 +3,29 @@ import { View } from "react-native";
 
 import { colors } from "@/theme/colors";
 
-export function Card({ children }: PropsWithChildren) {
+type Props = PropsWithChildren<{
+  tone?: "default" | "mint" | "honey" | "coral";
+}>;
+
+const backgrounds = {
+  default: colors.superficie,
+  mint: colors.superficieMenta,
+  honey: colors.superficieMiel,
+  coral: colors.superficieCoral,
+};
+
+export function Card({ children, tone = "default" }: Props) {
   return (
     <View
       style={{
-        backgroundColor: colors.superficie,
+        backgroundColor: backgrounds[tone],
         borderColor: colors.borde,
         borderCurve: "continuous",
-        borderRadius: 8,
+        borderRadius: 18,
         borderWidth: 1,
-        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
-        padding: 16,
-        gap: 10,
+        boxShadow: colors.sombra,
+        padding: 18,
+        gap: 12,
       }}
     >
       {children}

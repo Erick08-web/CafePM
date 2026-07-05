@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
 import { Card } from "@/components/card";
@@ -17,38 +18,42 @@ export default function Caja() {
   const loading = resumen.loading || cuentas.loading;
 
   return (
-    <Screen title="Caja" subtitle="Resumen monetario y cuentas pendientes de cobro." refreshing={loading} onRefresh={() => { void resumen.recargar(); void cuentas.recargar(); }}>
+    <Screen title="Caja" subtitle="Cuentas pendientes y resumen monetario para cerrar el dia con claridad." refreshing={loading} onRefresh={() => { void resumen.recargar(); void cuentas.recargar(); }}>
       <StatusMessage loading={loading} error={resumen.error ?? cuentas.error} onRetry={() => { void resumen.recargar(); void cuentas.recargar(); }} />
 
       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-        <Card>
-          <Text selectable style={{ color: colors.textoSuave }}>Ingresos</Text>
-          <Text selectable style={{ color: colors.texto, fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{money(resumen.data?.ingresos)}</Text>
-        </Card>
-        <Card>
-          <Text selectable style={{ color: colors.textoSuave }}>Gastos</Text>
-          <Text selectable style={{ color: colors.texto, fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{money(resumen.data?.gastos)}</Text>
-        </Card>
-        <Card>
-          <Text selectable style={{ color: colors.textoSuave }}>Compras</Text>
-          <Text selectable style={{ color: colors.texto, fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{money(resumen.data?.compras)}</Text>
-        </Card>
-        <Card>
-          <Text selectable style={{ color: colors.textoSuave }}>Ganancia</Text>
-          <Text selectable style={{ color: colors.cafe, fontSize: 22, fontWeight: "800", fontVariant: ["tabular-nums"] }}>{money(resumen.data?.ganancia_estimada)}</Text>
-        </Card>
-      </View>
-
-      <Card>
-        <Text selectable style={{ color: colors.texto, fontSize: 18, fontWeight: "800" }}>Cuentas pendientes</Text>
-        {(cuentas.data ?? []).map((cuenta) => (
-          <View key={cuenta.id_pedido} style={{ borderBottomColor: colors.borde, borderBottomWidth: 1, paddingVertical: 12, gap: 4 }}>
-            <Text selectable style={{ color: colors.texto, fontWeight: "800" }}>Pedido #{cuenta.id_pedido} · Mesa {cuenta.numero_mesa}</Text>
-            <Text selectable style={{ color: colors.textoSuave }}>{cuenta.estado}</Text>
-            <Text selectable style={{ color: colors.cafe, fontSize: 18, fontWeight: "800" }}>{money(cuenta.total)}</Text>
+        {[
+          ["Ingresos", money(resumen.data?.ingresos), colors.menta, "trending-up"],
+          ["Gastos", money(resumen.data?.gastos), colors.coral, "receipt-text-outline"],
+          ["Compras", money(resumen.data?.compras), colors.azul, "cart-outline"],
+          ["Ganancia", money(resumen.data?.ganancia_estimada), colors.acento, "cash-multiple"],
+        ].map(([label, value, accent, icon]) => (
+          <View key={String(label)} style={{ backgroundColor: colors.superficie, borderColor: colors.borde, borderRadius: 18, borderWidth: 1, boxShadow: colors.sombra, flexBasis: "47%", flexGrow: 1, gap: 8, padding: 15 }}>
+            <MaterialCommunityIcons name={icon as keyof typeof MaterialCommunityIcons.glyphMap} size={24} color={String(accent)} />
+            <Text selectable style={{ color: colors.textoSuave, fontWeight: "800" }}>{label}</Text>
+            <Text selectable style={{ color: colors.texto, fontSize: 22, fontWeight: "900", fontVariant: ["tabular-nums"] }}>{value}</Text>
           </View>
         ))}
-        {(cuentas.data ?? []).length === 0 ? <Text selectable style={{ color: colors.textoSuave }}>No hay cuentas pendientes.</Text> : null}
+      </View>
+
+      <Card tone="mint">
+        <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
+          <View>
+            <Text selectable style={{ color: colors.texto, fontSize: 20, fontWeight: "900" }}>Cuentas pendientes</Text>
+            <Text selectable style={{ color: colors.textoSuave, fontWeight: "600" }}>Pedidos listos para cobrar</Text>
+          </View>
+          <MaterialCommunityIcons name="cash-register" size={30} color={colors.menta} />
+        </View>
+        {(cuentas.data ?? []).map((cuenta) => (
+          <View key={cuenta.id_pedido} style={{ backgroundColor: colors.superficie, borderColor: colors.borde, borderRadius: 16, borderWidth: 1, padding: 14, gap: 5 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 10 }}>
+              <Text selectable style={{ color: colors.texto, flex: 1, fontWeight: "900" }}>Pedido #{cuenta.id_pedido} · Mesa {cuenta.numero_mesa}</Text>
+              <Text selectable style={{ color: colors.menta, fontSize: 18, fontWeight: "900" }}>{money(cuenta.total)}</Text>
+            </View>
+            <Text selectable style={{ color: colors.textoSuave, fontWeight: "700" }}>{cuenta.estado}</Text>
+          </View>
+        ))}
+        {(cuentas.data ?? []).length === 0 ? <Text selectable style={{ color: colors.textoSuave, fontWeight: "700" }}>No hay cuentas pendientes.</Text> : null}
       </Card>
     </Screen>
   );
