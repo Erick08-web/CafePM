@@ -5,6 +5,7 @@
   <div>
     <p class="eyebrow">Reportes</p>
     <h1>Reportes filtrados</h1>
+    <p class="subtitulo">Consulta y descarga reportes generados por el backend.</p>
   </div>
   <div class="segmentos">
     <a class="{{ 'activo' if tipo == 'pedidos' else '' }}" href="{{ url_for('reportes', tipo='pedidos') }}">Pedidos</a>
@@ -14,11 +15,15 @@
 </header>
 
 <div class="acciones-reporte">
-  <a class="boton" href="{{ api_base_url }}/reportes/{{ tipo }}/pdf">Descargar PDF</a>
-  <a class="boton secundario" href="{{ api_base_url }}/reportes/{{ tipo }}/xlsx">Descargar XLSX</a>
+  <a class="boton" href="{{ url_for('descargar_reporte', tipo=tipo, formato='pdf') }}">Descargar PDF</a>
+  <a class="boton secundario" href="{{ url_for('descargar_reporte', tipo=tipo, formato='xlsx') }}">Descargar XLSX</a>
 </div>
 
 <div class="panel tabla-scroll">
+  <div class="panel__titulo">
+    <h2>{{ tipo|capitalize }}</h2>
+    <span>{{ datos|length }} registros</span>
+  </div>
   {% if datos %}
   <table>
     <thead>
@@ -32,14 +37,20 @@
       {% for fila in datos %}
       <tr>
         {% for valor in fila.values() %}
-        <td>{{ valor }}</td>
+        <td>
+          {% if valor in ['pendiente', 'en_preparacion', 'listo', 'entregado', 'pagado', 'cancelado', 'recibida'] %}
+          <span class="badge estado-{{ valor }}">{{ valor }}</span>
+          {% else %}
+          {{ valor }}
+          {% endif %}
+        </td>
         {% endfor %}
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-  <p>No hay datos disponibles para este reporte.</p>
+  <p class="vacio">No hay datos disponibles para este reporte.</p>
   {% endif %}
 </div>
 {% endblock %}

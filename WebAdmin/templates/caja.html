@@ -5,39 +5,87 @@
   <div>
     <p class="eyebrow">Modulo caja</p>
     <h1>Cuentas, gastos y compras</h1>
+    <p class="subtitulo">Resumen financiero real y movimientos administrativos registrados.</p>
   </div>
 </header>
 
 <section class="metricas">
-  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong></article>
-  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong></article>
-  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong></article>
-  <article><span>Ganancia</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong></article>
+  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong><small>Pagos confirmados</small></article>
+  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong><small>Salidas registradas</small></article>
+  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong><small>Compras de insumos</small></article>
+  <article><span>Ganancia</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong><small>Estimacion actual</small></article>
 </section>
 
 <section class="grid-dos">
   <div class="panel">
-    <h2>Cuentas pendientes</h2>
-    <table>
-      <thead><tr><th>Pedido</th><th>Mesa</th><th>Total</th><th>Estado</th></tr></thead>
-      <tbody>
-        {% for cuenta in cuentas %}
-        <tr><td>#{{ cuenta.id_pedido }}</td><td>{{ cuenta.numero_mesa }}</td><td>${{ '%.2f'|format(cuenta.total or 0) }}</td><td>{{ cuenta.estado }}</td></tr>
-        {% else %}
-        <tr><td colspan="4">Sin cuentas pendientes.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="panel__titulo">
+      <h2>Cuentas pendientes</h2>
+      <span>{{ cuentas|length }} abiertas</span>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Pedido</th><th>Mesa</th><th>Total</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody>
+          {% for cuenta in cuentas %}
+          <tr>
+            <td>#{{ cuenta.id_pedido }}</td>
+            <td>Mesa {{ cuenta.numero_mesa }}</td>
+            <td>${{ '%.2f'|format(cuenta.total or 0) }}</td>
+            <td><span class="badge estado-{{ cuenta.estado }}">{{ cuenta.estado }}</span></td>
+            <td>{{ cuenta.fecha_hora }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="vacio">Sin cuentas pendientes.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="panel">
-    <h2>Ultimos gastos</h2>
+    <div class="panel__titulo">
+      <h2>Ultimos gastos</h2>
+      <span>{{ gastos|length }} registros</span>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Concepto</th><th>Categoria</th><th>Monto</th><th>Usuario</th></tr></thead>
+        <tbody>
+          {% for gasto in gastos[:6] %}
+          <tr>
+            <td>{{ gasto.concepto }}</td>
+            <td>{{ gasto.categoria }}</td>
+            <td>${{ '%.2f'|format(gasto.monto or 0) }}</td>
+            <td>{{ gasto.usuario or 'Sin usuario' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="vacio">Sin gastos registrados.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel__titulo">
+    <h2>Compras recientes</h2>
+    <span>{{ compras|length }} registros</span>
+  </div>
+  <div class="tabla-scroll">
     <table>
-      <thead><tr><th>Concepto</th><th>Categoria</th><th>Monto</th></tr></thead>
+      <thead><tr><th>ID</th><th>Proveedor</th><th>Usuario</th><th>Estado</th><th>Total</th><th>Fecha</th></tr></thead>
       <tbody>
-        {% for gasto in gastos[:5] %}
-        <tr><td>{{ gasto.concepto }}</td><td>{{ gasto.categoria }}</td><td>${{ '%.2f'|format(gasto.monto or 0) }}</td></tr>
+        {% for compra in compras[:8] %}
+        <tr>
+          <td>#{{ compra.id_compra }}</td>
+          <td>{{ compra.proveedor or 'Sin proveedor' }}</td>
+          <td>{{ compra.usuario or 'Sin usuario' }}</td>
+          <td><span class="badge estado-{{ compra.estado }}">{{ compra.estado }}</span></td>
+          <td>${{ '%.2f'|format(compra.total or 0) }}</td>
+          <td>{{ compra.fecha_compra }}</td>
+        </tr>
         {% else %}
-        <tr><td colspan="3">Sin gastos registrados.</td></tr>
+        <tr><td colspan="6" class="vacio">Sin compras registradas.</td></tr>
         {% endfor %}
       </tbody>
     </table>

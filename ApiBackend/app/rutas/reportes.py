@@ -3,6 +3,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.seguridad import requerir_permisos
 from app.servicios.consultas import listar_diccionarios
 from app.servicios.reportes import crear_pdf, crear_xlsx
 
@@ -38,22 +39,22 @@ def obtener_datos_reporte(tipo: str, sesion: Session):
 
 
 @router.get("/pedidos")
-def reporte_pedidos(sesion: Session = Depends(obtener_sesion)):
+def reporte_pedidos(sesion: Session = Depends(obtener_sesion), usuario=Depends(requerir_permisos("admin"))):
     return obtener_datos_reporte("pedidos", sesion)
 
 
 @router.get("/inventario")
-def reporte_inventario(sesion: Session = Depends(obtener_sesion)):
+def reporte_inventario(sesion: Session = Depends(obtener_sesion), usuario=Depends(requerir_permisos("admin"))):
     return obtener_datos_reporte("inventario", sesion)
 
 
 @router.get("/productos")
-def reporte_productos(sesion: Session = Depends(obtener_sesion)):
+def reporte_productos(sesion: Session = Depends(obtener_sesion), usuario=Depends(requerir_permisos("admin"))):
     return obtener_datos_reporte("productos", sesion)
 
 
 @router.get("/{tipo}/pdf")
-def descargar_reporte_pdf(tipo: str, sesion: Session = Depends(obtener_sesion)):
+def descargar_reporte_pdf(tipo: str, sesion: Session = Depends(obtener_sesion), usuario=Depends(requerir_permisos("admin"))):
     datos = obtener_datos_reporte(tipo, sesion)
     archivo = crear_pdf(tipo, datos)
     return StreamingResponse(
@@ -64,7 +65,7 @@ def descargar_reporte_pdf(tipo: str, sesion: Session = Depends(obtener_sesion)):
 
 
 @router.get("/{tipo}/xlsx")
-def descargar_reporte_xlsx(tipo: str, sesion: Session = Depends(obtener_sesion)):
+def descargar_reporte_xlsx(tipo: str, sesion: Session = Depends(obtener_sesion), usuario=Depends(requerir_permisos("admin"))):
     datos = obtener_datos_reporte(tipo, sesion)
     archivo = crear_xlsx(tipo, datos)
     return StreamingResponse(

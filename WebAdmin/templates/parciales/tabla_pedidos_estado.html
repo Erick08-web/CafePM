@@ -2,9 +2,12 @@
   <thead><tr><th>Estado</th><th>Total</th></tr></thead>
   <tbody>
     {% for item in pedidos %}
-    <tr><td>{{ item.estado }}</td><td>{{ item.total }}</td></tr>
+    <tr>
+      <td><span class="badge estado-{{ item.estado }}">{{ item.estado }}</span></td>
+      <td>{{ item.total }}</td>
+    </tr>
     {% else %}
-    <tr><td colspan="2">Sin pedidos.</td></tr>
+    <tr><td colspan="2" class="vacio">Sin pedidos.</td></tr>
     {% endfor %}
   </tbody>
 </table>

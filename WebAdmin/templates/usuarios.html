@@ -5,11 +5,12 @@
   <div>
     <p class="eyebrow">Usuarios y roles</p>
     <h1>Gestion de usuarios</h1>
+    <p class="subtitulo">Administra accesos, roles y permisos sin alterar el historial operativo.</p>
   </div>
   <a class="boton" href="{{ url_for('usuario_nuevo') }}">Nuevo usuario</a>
 </header>
 
-<div class="panel">
+<div class="panel tabla-scroll">
   <table>
     <thead>
       <tr>
@@ -18,19 +19,36 @@
         <th>Correo</th>
         <th>Rol</th>
         <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       {% for usuario in usuarios %}
       <tr>
         <td>{{ usuario.id_usuario }}</td>
-        <td>{{ usuario.nombre }}</td>
+        <td><strong>{{ usuario.nombre }}</strong></td>
         <td>{{ usuario.correo }}</td>
         <td>{{ usuario.rol }}</td>
         <td><span class="estado {{ 'ok' if usuario.activo else 'error' }}">{{ 'Activo' if usuario.activo else 'Inactivo' }}</span></td>
+        <td>
+          <div class="acciones-tabla">
+            <a class="boton compacto secundario" href="{{ url_for('usuario_editar', id_usuario=usuario.id_usuario) }}">
+              Editar
+            </a>
+            {% if usuario.activo %}
+            <form
+              method="post"
+              action="{{ url_for('usuario_eliminar', id_usuario=usuario.id_usuario) }}"
+              onsubmit="return confirm('¿Eliminar a {{ usuario.nombre|e }}? El usuario quedará inactivo y su historial se conservará.');"
+            >
+              <button class="boton compacto peligro" type="submit">Eliminar</button>
+            </form>
+            {% endif %}
+          </div>
+        </td>
       </tr>
       {% else %}
-      <tr><td colspan="5">No hay usuarios para mostrar.</td></tr>
+      <tr><td colspan="6" class="vacio">No hay usuarios para mostrar.</td></tr>
       {% endfor %}
     </tbody>
   </table>

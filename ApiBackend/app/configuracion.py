@@ -6,6 +6,7 @@ class Configuracion(BaseSettings):
     jwt_secret_key: str = "dev-secret"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 120
+    cors_origins: list[str] = ["*"]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

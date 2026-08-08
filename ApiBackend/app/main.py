@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.base_datos import probar_conexion
+from app.configuracion import configuracion
 from app.rutas import auth, caja, catalogos, cocina, estadisticas, mesero, reportes, usuarios
 
 app = FastAPI(
@@ -12,7 +13,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=configuracion.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

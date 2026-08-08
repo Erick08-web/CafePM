@@ -3,6 +3,8 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.configuracion import configuracion
+from app.seguridad import crear_token_acceso
 from app.servicios.consultas import obtener_diccionario, listar_diccionarios
 
 router = APIRouter(prefix="/auth", tags=["Autenticacion"])
@@ -18,10 +20,11 @@ def login(datos: LoginDatos, sesion: Session = Depends(obtener_sesion)):
     usuario = obtener_diccionario(
         sesion,
         """
-        SELECT id_usuario, nombre, correo, id_rol, activo
-        FROM usuarios
-        WHERE correo = :correo
-          AND password_hash = crypt(:password, password_hash)
+        SELECT u.id_usuario, u.nombre, u.correo, u.id_rol, r.nombre AS rol, u.activo
+        FROM usuarios u
+        JOIN roles r ON r.id_rol = u.id_rol
+        WHERE u.correo = :correo
+          AND u.password_hash = crypt(:password, u.password_hash)
         """,
         datos.model_dump(),
     )
@@ -39,4 +42,11 @@ def login(datos: LoginDatos, sesion: Session = Depends(obtener_sesion)):
         """,
         {"id_usuario": usuario["id_usuario"]},
     )
-    return usuario
+    token = crear_token_acceso(usuario)
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "expires_in": configuracion.access_token_expire_minutes * 60,
+        "usuario": usuario,
+        **usuario,
+    }

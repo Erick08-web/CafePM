@@ -8,7 +8,7 @@
       <td>${{ '%.2f'|format(producto.importe_vendido or 0) }}</td>
     </tr>
     {% else %}
-    <tr><td colspan="3">No hay ventas registradas.</td></tr>
+    <tr><td colspan="3" class="vacio">No hay ventas registradas.</td></tr>
     {% endfor %}
   </tbody>
 </table>

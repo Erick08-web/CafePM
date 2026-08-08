@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login - {{ nombre_proyecto }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <section class="login-panel">
+      <div class="marca login-marca">
+        <span class="marca__simbolo">CC</span>
+        <div>
+          <strong>{{ nombre_proyecto }}</strong>
+          <small>Web Admin</small>
+        </div>
+      </div>
+
+      {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+          <div class="mensajes">
+            {% for categoria, mensaje in mensajes %}
+              <p class="mensaje {{ categoria }}">{{ mensaje }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <form class="formulario login-form" method="post">
+        <div>
+          <p class="eyebrow">Acceso administrativo</p>
+          <h1>Iniciar sesion</h1>
+          <p class="subtitulo">Usa una cuenta con rol o permiso Admin para entrar al panel.</p>
+        </div>
+
+        <label>
+          Correo
+          <input name="correo" type="email" required autocomplete="email" autofocus>
+        </label>
+        <label>
+          Contrasena
+          <input name="password" type="password" required autocomplete="current-password">
+        </label>
+        <button class="boton" type="submit">Entrar a WebAdmin</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

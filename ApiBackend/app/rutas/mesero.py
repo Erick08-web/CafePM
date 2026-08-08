@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.seguridad import requerir_permisos
 from app.servicios.consultas import listar_diccionarios, obtener_diccionario
 
 router = APIRouter(prefix="/mesero", tags=["Modulo Mesero"])
@@ -11,23 +12,29 @@ router = APIRouter(prefix="/mesero", tags=["Modulo Mesero"])
 
 class DetallePedidoCrear(BaseModel):
     id_producto: int
-    cantidad: int
+    cantidad: int = Field(gt=0)
     observaciones: str | None = None
 
 
 class PedidoCrear(BaseModel):
     id_mesa: int
     id_mesero: int
-    productos: list[DetallePedidoCrear]
+    productos: list[DetallePedidoCrear] = Field(min_length=1)
 
 
 @router.get("/mesas")
-def listar_mesas(sesion: Session = Depends(obtener_sesion)):
+def listar_mesas(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("mesero", "caja")),
+):
     return listar_diccionarios(sesion, "SELECT * FROM mesas ORDER BY numero_mesa")
 
 
 @router.get("/productos")
-def listar_productos(sesion: Session = Depends(obtener_sesion)):
+def listar_productos(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("mesero")),
+):
     return listar_diccionarios(
         sesion,
         """
@@ -42,9 +49,34 @@ def listar_productos(sesion: Session = Depends(obtener_sesion)):
 
 
 @router.post("/pedidos", status_code=status.HTTP_201_CREATED)
-def crear_pedido(datos: PedidoCrear, sesion: Session = Depends(obtener_sesion)):
-    if not datos.productos:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El pedido debe tener productos")
+def crear_pedido(
+    datos: PedidoCrear,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("mesero")),
+):
+    if datos.id_mesero != usuario["id_usuario"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No puedes crear pedidos a nombre de otro usuario")
+
+    mesa = obtener_diccionario(
+        sesion,
+        "SELECT id_mesa, estado FROM mesas WHERE id_mesa = :id_mesa",
+        {"id_mesa": datos.id_mesa},
+    )
+    if mesa is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Mesa no encontrada")
+    if mesa["estado"] != "libre":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="La mesa no esta disponible para crear pedido")
+
+    productos_validos = {}
+    for item in datos.productos:
+        producto = obtener_diccionario(
+            sesion,
+            "SELECT id_producto, precio FROM productos WHERE id_producto = :id_producto AND activo = TRUE",
+            {"id_producto": item.id_producto},
+        )
+        if producto is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Producto {item.id_producto} no encontrado o inactivo")
+        productos_validos[item.id_producto] = producto
 
     pedido = obtener_diccionario(
         sesion,
@@ -57,13 +89,7 @@ def crear_pedido(datos: PedidoCrear, sesion: Session = Depends(obtener_sesion)):
     )
 
     for item in datos.productos:
-        producto = obtener_diccionario(
-            sesion,
-            "SELECT id_producto, precio FROM productos WHERE id_producto = :id_producto AND activo = TRUE",
-            {"id_producto": item.id_producto},
-        )
-        if producto is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Producto {item.id_producto} no encontrado")
+        producto = productos_validos[item.id_producto]
 
         sesion.execute(
             text(
@@ -86,7 +112,11 @@ def crear_pedido(datos: PedidoCrear, sesion: Session = Depends(obtener_sesion)):
 
 
 @router.get("/pedidos/{id_pedido}")
-def obtener_pedido(id_pedido: int, sesion: Session = Depends(obtener_sesion)):
+def obtener_pedido(
+    id_pedido: int,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("mesero", "caja")),
+):
     pedido = obtener_diccionario(sesion, "SELECT * FROM pedidos WHERE id_pedido = :id_pedido", {"id_pedido": id_pedido})
     if pedido is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pedido no encontrado")

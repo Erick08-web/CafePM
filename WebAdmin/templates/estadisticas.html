@@ -5,24 +5,39 @@
   <div>
     <p class="eyebrow">Estadisticas</p>
     <h1>Gastos, ganancias y productos</h1>
+    <p class="subtitulo">Lectura financiera y comercial basada en vistas reales del backend.</p>
   </div>
 </header>
 
 <section class="metricas">
-  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong></article>
-  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong></article>
-  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong></article>
-  <article><span>Ganancia estimada</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong></article>
+  <article><span>Ingresos</span><strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong><small>Pagos registrados</small></article>
+  <article><span>Gastos</span><strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong><small>Gastos administrativos</small></article>
+  <article><span>Compras</span><strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong><small>Compras registradas</small></article>
+  <article><span>Ganancia estimada</span><strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong><small>Resultado estimado</small></article>
 </section>
 
 <section class="grid-dos">
   <div class="panel">
-    <h2>Productos mas vendidos</h2>
+    <div class="panel__titulo">
+      <h2>Productos mas vendidos</h2>
+      <span>{{ productos|length }} productos</span>
+    </div>
     {% include "parciales/tabla_productos_vendidos.html" %}
   </div>
   <div class="panel">
-    <h2>Gastos por categoria</h2>
+    <div class="panel__titulo">
+      <h2>Gastos por categoria</h2>
+      <span>{{ gastos|length }} categorias</span>
+    </div>
     {% include "parciales/tabla_gastos_categoria.html" %}
   </div>
+</section>
+
+<section class="panel">
+  <div class="panel__titulo">
+    <h2>Pedidos por estado</h2>
+    <span>{{ pedidos|length }} estados</span>
+  </div>
+  {% include "parciales/tabla_pedidos_estado.html" %}
 </section>
 {% endblock %}

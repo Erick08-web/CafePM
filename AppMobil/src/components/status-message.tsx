@@ -1,7 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
-
-import { colors } from "@/theme/colors";
+import { ErrorState, LoadingState } from "@/components/app-state";
 
 type Props = {
   loading?: boolean;
@@ -11,36 +8,12 @@ type Props = {
 
 export function StatusMessage({ loading, error, onRetry }: Props) {
   if (loading) {
-    return (
-      <View style={{ backgroundColor: colors.superficieMenta, borderRadius: 18, padding: 14 }}>
-        <Text selectable style={{ color: colors.verde, fontWeight: "800" }}>Cargando datos frescos...</Text>
-      </View>
-    );
+    return <LoadingState title="Cargando datos" message="Sincronizando informacion reciente de la cafeteria." />;
   }
 
   if (!error) {
     return null;
   }
 
-  return (
-    <Pressable
-      onPress={onRetry}
-      style={{
-        backgroundColor: colors.rojoFondo,
-        borderColor: "#f1b8ad",
-        borderCurve: "continuous",
-        borderRadius: 18,
-        borderWidth: 1,
-        padding: 16,
-        gap: 10,
-      }}
-    >
-      <View style={{ alignItems: "center", flexDirection: "row", gap: 8 }}>
-        <MaterialCommunityIcons name="wifi-off" size={22} color={colors.rojo} />
-        <Text selectable style={{ color: colors.rojo, fontWeight: "900", fontSize: 17 }}>Sin conexion con la API</Text>
-      </View>
-      <Text selectable style={{ color: colors.rojo, lineHeight: 20, fontWeight: "600" }}>{error}</Text>
-      {onRetry ? <Text style={{ color: colors.rojo, fontWeight: "900" }}>Toca para reintentar</Text> : null}
-    </Pressable>
-  );
+  return <ErrorState title="Sin conexion con la API" message={error} onRetry={onRetry} />;
 }

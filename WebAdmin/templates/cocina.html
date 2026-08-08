@@ -5,16 +5,20 @@
   <div>
     <p class="eyebrow">Modulo cocina</p>
     <h1>Pedidos e inventario</h1>
+    <p class="subtitulo">Seguimiento operativo de pedidos activos e insumos bajo minimo.</p>
   </div>
 </header>
 
 <section class="grid-dos">
   <div class="panel">
-    <h2>Pedidos pendientes</h2>
+    <div class="panel__titulo">
+      <h2>Pedidos activos</h2>
+      <span>{{ pedidos|length }} en cocina</span>
+    </div>
     {% for pedido in pedidos %}
     <div class="pedido">
       <strong>Pedido #{{ pedido.id_pedido }} - Mesa {{ pedido.numero_mesa }}</strong>
-      <span>{{ pedido.estado }} · ${{ '%.2f'|format(pedido.total or 0) }}</span>
+      <span><span class="badge estado-{{ pedido.estado }}">{{ pedido.estado }}</span> ${{ '%.2f'|format(pedido.total or 0) }}</span>
       <ul>
         {% for item in pedido.detalle %}
         <li>{{ item.cantidad }} x {{ item.nombre }}{% if item.observaciones %} - {{ item.observaciones }}{% endif %}</li>
@@ -22,21 +26,31 @@
       </ul>
     </div>
     {% else %}
-    <p>No hay pedidos pendientes.</p>
+    <p class="vacio">No hay pedidos pendientes.</p>
     {% endfor %}
   </div>
   <div class="panel">
-    <h2>Inventario bajo</h2>
-    <table>
-      <thead><tr><th>Insumo</th><th>Stock</th><th>Minimo</th></tr></thead>
-      <tbody>
-        {% for item in inventario_bajo %}
-        <tr><td>{{ item.nombre }}</td><td>{{ item.stock_actual }} {{ item.unidad_medida }}</td><td>{{ item.stock_minimo }}</td></tr>
-        {% else %}
-        <tr><td colspan="3">Inventario en niveles correctos.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="panel__titulo">
+      <h2>Inventario bajo</h2>
+      <span>{{ inventario_bajo|length }} alertas</span>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Insumo</th><th>Stock</th><th>Minimo</th><th>Estado</th></tr></thead>
+        <tbody>
+          {% for item in inventario_bajo %}
+          <tr>
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.stock_actual }} {{ item.unidad_medida }}</td>
+            <td>{{ item.stock_minimo }} {{ item.unidad_medida }}</td>
+            <td><span class="badge alerta">Stock bajo</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="vacio">Inventario en niveles correctos.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 {% endblock %}

@@ -16,13 +16,19 @@
       </div>
     </div>
     <nav class="menu">
-      <a href="{{ url_for('inicio') }}">Dashboard</a>
-      <a href="{{ url_for('usuarios') }}">Usuarios</a>
-      <a href="{{ url_for('estadisticas') }}">Estadisticas</a>
-      <a href="{{ url_for('reportes') }}">Reportes</a>
-      <a href="{{ url_for('cocina') }}">Cocina</a>
-      <a href="{{ url_for('caja') }}">Caja</a>
+      <a class="{{ 'activo' if endpoint_actual == 'inicio' else '' }}" href="{{ url_for('inicio') }}">Dashboard</a>
+      <a class="{{ 'activo' if endpoint_actual in ['usuarios', 'usuario_nuevo', 'usuario_editar'] else '' }}" href="{{ url_for('usuarios') }}">Usuarios</a>
+      <a class="{{ 'activo' if endpoint_actual == 'estadisticas' else '' }}" href="{{ url_for('estadisticas') }}">Estadisticas</a>
+      <a class="{{ 'activo' if endpoint_actual == 'reportes' else '' }}" href="{{ url_for('reportes') }}">Reportes</a>
+      <a class="{{ 'activo' if endpoint_actual == 'cocina' else '' }}" href="{{ url_for('cocina') }}">Cocina</a>
+      <a class="{{ 'activo' if endpoint_actual == 'caja' else '' }}" href="{{ url_for('caja') }}">Caja</a>
     </nav>
+    {% if usuario_web %}
+    <form class="logout-form" method="post" action="{{ url_for('logout') }}">
+      <span>{{ usuario_web.nombre }}</span>
+      <button type="submit">Cerrar sesion</button>
+    </form>
+    {% endif %}
     <div class="api-estado {{ 'ok' if api_disponible else 'error' }}">
       API {{ 'conectada' if api_disponible else 'sin conexion' }}
       <small>{{ api_base_url }}</small>
@@ -30,6 +36,16 @@
   </aside>
 
   <main class="contenido">
+    <header class="topbar">
+      <div>
+        <strong>Operacion administrativa</strong>
+        <span>Supervision en tiempo real con datos de CafePM</span>
+      </div>
+      <span class="estado {{ 'ok' if api_disponible else 'error' }}">
+        {{ 'API activa' if api_disponible else 'API no disponible' }}
+      </span>
+    </header>
+
     {% with mensajes = get_flashed_messages(with_categories=true) %}
       {% if mensajes %}
         <div class="mensajes">

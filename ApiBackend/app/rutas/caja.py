@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.seguridad import requerir_permisos
 from app.servicios.consultas import listar_diccionarios, obtener_diccionario
 
 router = APIRouter(prefix="/caja", tags=["Modulo Caja"])
@@ -12,30 +14,33 @@ router = APIRouter(prefix="/caja", tags=["Modulo Caja"])
 class PagoCrear(BaseModel):
     id_pedido: int
     metodo_pago: str
-    monto: float
+    monto: float = Field(gt=0)
 
 
 class GastoCrear(BaseModel):
     id_usuario: int
     concepto: str
     id_categoria_gasto: int
-    monto: float
+    monto: float = Field(gt=0)
 
 
 class CompraDetalleCrear(BaseModel):
     id_insumo: int
-    cantidad: float
-    costo_unitario: float
+    cantidad: float = Field(gt=0)
+    costo_unitario: float = Field(ge=0)
 
 
 class CompraCrear(BaseModel):
     id_usuario: int
     id_proveedor: int | None = None
-    detalle: list[CompraDetalleCrear]
+    detalle: list[CompraDetalleCrear] = Field(min_length=1)
 
 
 @router.get("/cuentas")
-def listar_cuentas_pendientes(sesion: Session = Depends(obtener_sesion)):
+def listar_cuentas_pendientes(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja")),
+):
     return listar_diccionarios(
         sesion,
         """
@@ -49,22 +54,53 @@ def listar_cuentas_pendientes(sesion: Session = Depends(obtener_sesion)):
 
 
 @router.post("/pagos", status_code=status.HTTP_201_CREATED)
-def registrar_pago(datos: PagoCrear, sesion: Session = Depends(obtener_sesion)):
-    pago = obtener_diccionario(
+def registrar_pago(
+    datos: PagoCrear,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja")),
+):
+    if datos.metodo_pago not in {"efectivo", "tarjeta", "transferencia"}:
+        raise HTTPException(status_code=400, detail="Metodo de pago no valido")
+
+    pedido = obtener_diccionario(
         sesion,
-        """
-        INSERT INTO pagos (id_pedido, metodo_pago, monto)
-        VALUES (:id_pedido, :metodo_pago, :monto)
-        RETURNING *
-        """,
-        datos.model_dump(),
+        "SELECT id_pedido, estado, total FROM pedidos WHERE id_pedido = :id_pedido",
+        {"id_pedido": datos.id_pedido},
     )
-    sesion.commit()
-    return pago
+    if pedido is None:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+
+    if pedido["estado"] == "pagado":
+        raise HTTPException(status_code=409, detail="El pedido ya fue pagado")
+
+    if pedido["estado"] not in {"listo", "entregado"}:
+        raise HTTPException(status_code=409, detail="El pedido aun no esta listo para cobro")
+
+    if round(float(datos.monto), 2) != round(float(pedido["total"]), 2):
+        raise HTTPException(status_code=400, detail="El monto debe coincidir con el total del pedido")
+
+    try:
+        pago = obtener_diccionario(
+            sesion,
+            """
+            INSERT INTO pagos (id_pedido, metodo_pago, monto)
+            VALUES (:id_pedido, :metodo_pago, :monto)
+            RETURNING *
+            """,
+            datos.model_dump(),
+        )
+        sesion.commit()
+        return pago
+    except IntegrityError as error:
+        sesion.rollback()
+        raise HTTPException(status_code=409, detail="El pedido ya fue pagado") from error
 
 
 @router.get("/gastos")
-def listar_gastos(sesion: Session = Depends(obtener_sesion)):
+def listar_gastos(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja", "admin")),
+):
     return listar_diccionarios(
         sesion,
         """
@@ -78,7 +114,14 @@ def listar_gastos(sesion: Session = Depends(obtener_sesion)):
 
 
 @router.post("/gastos", status_code=status.HTTP_201_CREATED)
-def registrar_gasto(datos: GastoCrear, sesion: Session = Depends(obtener_sesion)):
+def registrar_gasto(
+    datos: GastoCrear,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja")),
+):
+    if datos.id_usuario != usuario["id_usuario"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No puedes registrar gastos a nombre de otro usuario")
+
     gasto = obtener_diccionario(
         sesion,
         """
@@ -93,7 +136,10 @@ def registrar_gasto(datos: GastoCrear, sesion: Session = Depends(obtener_sesion)
 
 
 @router.get("/compras")
-def listar_compras(sesion: Session = Depends(obtener_sesion)):
+def listar_compras(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja", "admin")),
+):
     return listar_diccionarios(
         sesion,
         """
@@ -107,9 +153,13 @@ def listar_compras(sesion: Session = Depends(obtener_sesion)):
 
 
 @router.post("/compras", status_code=status.HTTP_201_CREATED)
-def registrar_compra(datos: CompraCrear, sesion: Session = Depends(obtener_sesion)):
-    if not datos.detalle:
-        raise HTTPException(status_code=400, detail="La compra debe tener detalle")
+def registrar_compra(
+    datos: CompraCrear,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja")),
+):
+    if datos.id_usuario != usuario["id_usuario"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No puedes registrar compras a nombre de otro usuario")
 
     compra = obtener_diccionario(
         sesion,
@@ -135,7 +185,11 @@ def registrar_compra(datos: CompraCrear, sesion: Session = Depends(obtener_sesio
 
 
 @router.patch("/compras/{id_compra}/recibir")
-def recibir_compra(id_compra: int, sesion: Session = Depends(obtener_sesion)):
+def recibir_compra(
+    id_compra: int,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja")),
+):
     compra = obtener_diccionario(
         sesion,
         "UPDATE compras SET estado = 'recibida' WHERE id_compra = :id_compra RETURNING *",
@@ -148,5 +202,8 @@ def recibir_compra(id_compra: int, sesion: Session = Depends(obtener_sesion)):
 
 
 @router.get("/resumen")
-def resumen_caja(sesion: Session = Depends(obtener_sesion)):
+def resumen_caja(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("caja", "admin")),
+):
     return obtener_diccionario(sesion, "SELECT * FROM vw_resumen_financiero")

@@ -4,6 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.base_datos import obtener_sesion
+from app.seguridad import requerir_permisos
 from app.servicios.consultas import listar_diccionarios, obtener_diccionario
 
 router = APIRouter(prefix="/cocina", tags=["Modulo Cocina"])
@@ -14,7 +15,10 @@ class EstadoPedidoActualizar(BaseModel):
 
 
 @router.get("/pedidos")
-def listar_pedidos_cocina(sesion: Session = Depends(obtener_sesion)):
+def listar_pedidos_cocina(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("mesero", "cocina")),
+):
     pedidos = listar_diccionarios(
         sesion,
         """
@@ -41,33 +45,60 @@ def listar_pedidos_cocina(sesion: Session = Depends(obtener_sesion)):
 
 
 @router.patch("/pedidos/{id_pedido}/estado")
-def actualizar_estado_pedido(id_pedido: int, datos: EstadoPedidoActualizar, sesion: Session = Depends(obtener_sesion)):
-    if datos.estado not in {"pendiente", "en_preparacion", "listo", "entregado", "cancelado"}:
+def actualizar_estado_pedido(
+    id_pedido: int,
+    datos: EstadoPedidoActualizar,
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("cocina")),
+):
+    transiciones_validas = {
+        "pendiente": {"en_preparacion"},
+        "en_preparacion": {"listo"},
+    }
+    if datos.estado not in {"en_preparacion", "listo"}:
         raise HTTPException(status_code=400, detail="Estado no valido para cocina")
+
+    pedido_actual = obtener_diccionario(
+        sesion,
+        "SELECT id_pedido, estado FROM pedidos WHERE id_pedido = :id_pedido",
+        {"id_pedido": id_pedido},
+    )
+    if pedido_actual is None:
+        raise HTTPException(status_code=404, detail="Pedido no encontrado")
+
+    if datos.estado not in transiciones_validas.get(pedido_actual["estado"], set()):
+        raise HTTPException(status_code=409, detail="Transicion de estado no permitida")
 
     pedido = obtener_diccionario(
         sesion,
         "UPDATE pedidos SET estado = :estado WHERE id_pedido = :id_pedido RETURNING *",
         {"estado": datos.estado, "id_pedido": id_pedido},
     )
-    if pedido is None:
-        raise HTTPException(status_code=404, detail="Pedido no encontrado")
     sesion.commit()
     return pedido
 
 
 @router.get("/inventario")
-def listar_inventario(sesion: Session = Depends(obtener_sesion)):
+def listar_inventario(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("cocina")),
+):
     return listar_diccionarios(sesion, "SELECT * FROM inventario ORDER BY nombre")
 
 
 @router.get("/inventario-bajo")
-def listar_inventario_bajo(sesion: Session = Depends(obtener_sesion)):
+def listar_inventario_bajo(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("cocina", "admin")),
+):
     return listar_diccionarios(sesion, "SELECT * FROM vw_inventario_bajo ORDER BY nombre")
 
 
 @router.get("/menu")
-def listar_menu(sesion: Session = Depends(obtener_sesion)):
+def listar_menu(
+    sesion: Session = Depends(obtener_sesion),
+    usuario=Depends(requerir_permisos("cocina")),
+):
     return listar_diccionarios(
         sesion,
         """

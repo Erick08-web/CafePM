@@ -1,50 +1,69 @@
 {% extends "base.html" %}
-{% block titulo %}Nuevo usuario - {{ nombre_proyecto }}{% endblock %}
+{% block titulo %}{{ 'Editar usuario' if usuario else 'Nuevo usuario' }} - {{ nombre_proyecto }}{% endblock %}
 {% block contenido %}
 <header class="encabezado">
   <div>
     <p class="eyebrow">Usuarios y roles</p>
-    <h1>Nuevo usuario</h1>
+    <h1>{{ 'Editar usuario' if usuario else 'Nuevo usuario' }}</h1>
+    <p class="subtitulo">{{ 'Actualiza los datos del colaborador y sus permisos.' if usuario else 'Crea una cuenta administrativa con rol y permisos reales.' }}</p>
   </div>
 </header>
 
 <form class="formulario" method="post">
   <label>
     Nombre
-    <input name="nombre" required maxlength="100">
+    <input name="nombre" required maxlength="100" value="{{ usuario.nombre if usuario else '' }}">
   </label>
   <label>
     Correo
-    <input name="correo" type="email" required maxlength="100">
+    <input name="correo" type="email" required maxlength="100" value="{{ usuario.correo if usuario else '' }}">
   </label>
   <label>
-    Password
-    <input name="password" type="password" required>
+    {{ 'Nueva contraseña (opcional)' if usuario else 'Contraseña' }}
+    <input name="password" type="password" {% if not usuario %}required{% endif %} minlength="6">
   </label>
   <label>
     Rol
     <select name="id_rol" required>
       {% for rol in roles %}
-      <option value="{{ rol.id_rol }}">{{ rol.nombre }}</option>
+      <option value="{{ rol.id_rol }}" {% if usuario and usuario.id_rol == rol.id_rol %}selected{% endif %}>{{ rol.nombre }}</option>
       {% endfor %}
     </select>
   </label>
+
+  {% if usuario %}
+  <label>
+    Estado
+    <select name="activo" required>
+      <option value="true" {% if usuario.activo %}selected{% endif %}>Activo</option>
+      <option value="false" {% if not usuario.activo %}selected{% endif %}>Inactivo</option>
+    </select>
+  </label>
+  {% endif %}
 
   <fieldset>
     <legend>Permisos por modulo</legend>
     <div class="checks">
       {% for permiso in permisos %}
       <label>
-        <input type="checkbox" name="permisos" value="{{ permiso.id_permiso }}">
+        <input
+          type="checkbox"
+          name="permisos"
+          value="{{ permiso.id_permiso }}"
+          {% if permiso.id_permiso in permisos_usuario %}checked{% endif %}
+        >
         {{ permiso.nombre }}
       </label>
       {% endfor %}
+      {% if not permisos %}
+      <p class="vacio">No hay permisos disponibles desde la API.</p>
+      {% endif %}
     </div>
   </fieldset>
 
   <div class="acciones-formulario">
     <a class="boton secundario" href="{{ url_for('usuarios') }}">Cancelar</a>
-    <button class="boton" type="submit">Crear usuario</button>
+    <button class="boton" type="submit">{{ 'Guardar cambios' if usuario else 'Crear usuario' }}</button>
   </div>
 </form>
 {% endblock %}

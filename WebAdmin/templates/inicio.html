@@ -4,7 +4,8 @@
 <header class="encabezado">
   <div>
     <p class="eyebrow">Panel administrativo</p>
-    <h1>Dashboard</h1>
+    <h1>Resumen operativo</h1>
+    <p class="subtitulo">Indicadores reales de caja, pedidos, usuarios e inventario.</p>
   </div>
 </header>
 
@@ -12,29 +13,125 @@
   <article>
     <span>Ingresos</span>
     <strong>${{ '%.2f'|format(resumen.get('ingresos', 0) or 0) }}</strong>
-  </article>
-  <article>
-    <span>Gastos</span>
-    <strong>${{ '%.2f'|format(resumen.get('gastos', 0) or 0) }}</strong>
-  </article>
-  <article>
-    <span>Compras</span>
-    <strong>${{ '%.2f'|format(resumen.get('compras', 0) or 0) }}</strong>
+    <small>Pagos registrados</small>
   </article>
   <article>
     <span>Ganancia estimada</span>
     <strong>${{ '%.2f'|format(resumen.get('ganancia_estimada', 0) or 0) }}</strong>
+    <small>Ingresos menos gastos y compras</small>
+  </article>
+  <article>
+    <span>Pedidos</span>
+    <strong>{{ total_pedidos }}</strong>
+    <small>Distribuidos por estado</small>
+  </article>
+  <article>
+    <span>Inventario bajo</span>
+    <strong>{{ inventario_bajo|length }}</strong>
+    <small>Insumos bajo minimo</small>
   </article>
 </section>
 
 <section class="grid-dos">
   <div class="panel">
-    <h2>Productos mas vendidos</h2>
+    <div class="panel__titulo">
+      <h2>Productos mas vendidos</h2>
+      <span>{{ productos|length }} registros</span>
+    </div>
     {% include "parciales/tabla_productos_vendidos.html" %}
   </div>
   <div class="panel">
-    <h2>Pedidos por estado</h2>
+    <div class="panel__titulo">
+      <h2>Pedidos por estado</h2>
+      <span>{{ total_pedidos }} pedidos</span>
+    </div>
     {% include "parciales/tabla_pedidos_estado.html" %}
+  </div>
+</section>
+
+<section class="grid-tres">
+  <div class="panel">
+    <div class="panel__titulo">
+      <h2>Cuentas por cobrar</h2>
+      <span>{{ cuentas|length }} abiertas</span>
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead><tr><th>Pedido</th><th>Mesa</th><th>Total</th><th>Estado</th></tr></thead>
+        <tbody>
+          {% for cuenta in cuentas[:5] %}
+          <tr>
+            <td>#{{ cuenta.id_pedido }}</td>
+            <td>Mesa {{ cuenta.numero_mesa }}</td>
+            <td>${{ '%.2f'|format(cuenta.total or 0) }}</td>
+            <td><span class="badge estado-{{ cuenta.estado }}">{{ cuenta.estado }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="vacio">Sin cuentas pendientes.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel__titulo">
+      <h2>Inventario bajo</h2>
+      <span>{{ inventario_bajo|length }} alertas</span>
+    </div>
+    <div class="lista-compacta">
+      {% for item in inventario_bajo[:5] %}
+      <div>
+        <strong>{{ item.nombre }}</strong>
+        <span>{{ item.stock_actual }} {{ item.unidad_medida }} · minimo {{ item.stock_minimo }}</span>
+      </div>
+      {% else %}
+      <p class="vacio">Inventario en niveles correctos.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel__titulo">
+      <h2>Usuarios</h2>
+      <span>{{ usuarios_activos }} activos</span>
+    </div>
+    <div class="lista-compacta">
+      {% for usuario in usuarios[:5] %}
+      <div>
+        <strong>{{ usuario.nombre }}</strong>
+        <span>{{ usuario.rol }} · {{ 'Activo' if usuario.activo else 'Inactivo' }}</span>
+      </div>
+      {% else %}
+      <p class="vacio">Sin usuarios para mostrar.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel__titulo">
+    <h2>Ultimos pedidos</h2>
+    <span>{{ ultimos_pedidos|length }} recientes</span>
+  </div>
+  <div class="tabla-scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Mesa</th><th>Mesero</th><th>Estado</th><th>Total</th><th>Fecha</th></tr></thead>
+      <tbody>
+        {% for pedido in ultimos_pedidos %}
+        <tr>
+          <td>#{{ pedido.id_pedido }}</td>
+          <td>{{ pedido.numero_mesa or 'Sin mesa' }}</td>
+          <td>{{ pedido.mesero or 'Sin asignar' }}</td>
+          <td><span class="badge estado-{{ pedido.estado }}">{{ pedido.estado }}</span></td>
+          <td>${{ '%.2f'|format(pedido.total or 0) }}</td>
+          <td>{{ pedido.fecha_hora }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="vacio">No hay pedidos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </section>
 {% endblock %}

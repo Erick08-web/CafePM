@@ -1,55 +1,55 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, type Href } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
-import { colors } from "@/theme/colors";
+import { AppCard } from "@/components/app-card";
+import { colors, radius, spacing, typography } from "@/theme";
 
 type Props = {
-  href: "/mesero" | "/cocina" | "/caja";
+  href: Href;
   title: string;
   description: string;
   label: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  accent: string;
-  background: string;
+  accent?: string;
 };
 
-export function ModuleLink({ href, title, description, label, icon, accent, background }: Props) {
+export function ModuleLink({ href, title, description, label, icon, accent = colors.verdeOscuro }: Props) {
   return (
     <Link href={href} asChild>
       <Pressable>
-        <View
-          style={{
-            backgroundColor: background,
-            borderColor: colors.borde,
-            borderCurve: "continuous",
-            borderRadius: 22,
-            borderWidth: 1,
-            boxShadow: colors.sombra,
-            gap: 14,
-            padding: 18,
-          }}
-        >
-          <View style={{ alignItems: "center", flexDirection: "row", gap: 12 }}>
-            <View
-              style={{
-                alignItems: "center",
-                backgroundColor: accent,
-                borderRadius: 16,
-                height: 48,
-                justifyContent: "center",
-                width: 48,
-              }}
-            >
-              <MaterialCommunityIcons name={icon} size={27} color="#fffdf8" />
+        {({ pressed }) => (
+          <AppCard style={{ opacity: pressed ? 0.9 : 1 }}>
+            <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.md }}>
+              <View
+                style={{
+                  alignItems: "center",
+                  backgroundColor: colors.superficieMenta,
+                  borderColor: "#c6ddcf",
+                  borderRadius: radius.lg,
+                  borderWidth: 1,
+                  height: 50,
+                  justifyContent: "center",
+                  width: 50,
+                }}
+              >
+                <MaterialCommunityIcons name={icon} size={27} color={accent} />
+              </View>
+              <View style={{ flex: 1, gap: spacing.xs }}>
+                <Text selectable style={{ color: colors.texto, fontSize: typography.title, fontWeight: "900" }}>
+                  {title}
+                </Text>
+                <Text selectable style={{ color: colors.textoSuave, fontWeight: "600", lineHeight: 20 }}>
+                  {description}
+                </Text>
+              </View>
+              <MaterialCommunityIcons name="chevron-right" size={24} color={colors.textoSuave} />
             </View>
-            <View style={{ flex: 1, gap: 3 }}>
-              <Text selectable style={{ color: colors.texto, fontSize: 21, fontWeight: "900" }}>{title}</Text>
-              <Text selectable style={{ color: colors.textoSuave, lineHeight: 20, fontWeight: "600" }}>{description}</Text>
-            </View>
-          </View>
-          <Text style={{ color: accent, fontWeight: "900" }}>{label}</Text>
-        </View>
+            <Text selectable style={{ color: accent, fontWeight: "900" }}>
+              {label}
+            </Text>
+          </AppCard>
+        )}
       </Pressable>
     </Link>
   );

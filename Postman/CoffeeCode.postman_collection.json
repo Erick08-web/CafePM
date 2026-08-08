@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Coffee Code API",
-    "description": "Coleccion para probar los endpoints principales del segundo parcial: Web Admin, Cocina, Caja y Mesero.",
+    "description": "Coleccion para probar CafePM / Coffee Code en el tercer parcial: login JWT, AppMobil, WebAdmin, Cocina, Caja, Mesero, estadisticas y reportes.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -28,7 +28,7 @@
       "name": "Autenticacion",
       "item": [
         {
-          "name": "Login Admin",
+          "name": "Login Admin - Capturar token",
           "request": {
             "method": "POST",
             "header": [
@@ -42,7 +42,22 @@
               "raw": "{\n  \"correo\": \"admin@coffeecode.com\",\n  \"password\": \"admin123\"\n}"
             },
             "url": "{{api_url}}/auth/login"
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Login admin exitoso\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set(\"token\", data.access_token);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Login Mesero",
@@ -57,6 +72,40 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"correo\": \"mesero@coffeecode.com\",\n  \"password\": \"1234\"\n}"
+            },
+            "url": "{{api_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Cocina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"cocina@coffeecode.com\",\n  \"password\": \"1234\"\n}"
+            },
+            "url": "{{api_url}}/auth/login"
+          }
+        },
+        {
+          "name": "Login Caja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"caja@coffeecode.com\",\n  \"password\": \"1234\"\n}"
             },
             "url": "{{api_url}}/auth/login"
           }
@@ -331,7 +380,21 @@
   "variable": [
     {
       "key": "api_url",
-      "value": "http://localhost:8000"
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
     }
-  ]
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  }
 }

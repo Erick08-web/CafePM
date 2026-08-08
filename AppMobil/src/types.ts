@@ -15,7 +15,9 @@ export type Producto = {
 
 export type PedidoCocina = {
   id_pedido: number;
+  id_mesa?: number | null;
   numero_mesa: number;
+  fecha_hora?: string;
   estado: string;
   total: number;
   detalle: Array<{
@@ -25,6 +27,8 @@ export type PedidoCocina = {
     observaciones?: string | null;
   }>;
 };
+
+export type EstadoPedido = "pendiente" | "en_preparacion" | "listo" | "entregado" | "pagado" | "cancelado";
 
 export type ResumenCaja = {
   ingresos: number;
@@ -43,7 +47,102 @@ export type Inventario = {
 
 export type Cuenta = {
   id_pedido: number;
+  id_mesa?: number | null;
   numero_mesa: number;
+  fecha_hora?: string;
+  estado: string;
+  total: number;
+};
+
+export type DetallePedido = {
+  id_detalle: number;
+  id_producto: number;
+  nombre: string;
+  cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+  observaciones?: string | null;
+};
+
+export type PedidoDetalle = {
+  id_pedido: number;
+  id_mesa: number | null;
+  id_mesero: number | null;
+  fecha_hora: string;
+  estado: string;
+  total: number;
+  detalle: DetallePedido[];
+};
+
+export type MetodoPago = "efectivo" | "tarjeta" | "transferencia";
+
+export type PagoCrear = {
+  id_pedido: number;
+  metodo_pago: MetodoPago;
+  monto: number;
+};
+
+export type PagoCreado = {
+  id_pago: number;
+  id_pedido: number;
+  metodo_pago: MetodoPago;
+  monto: number;
+  fecha_pago: string;
+};
+
+export type PedidoPorEstado = {
+  estado: string;
+  total: number;
+};
+
+export type UsuarioResumen = {
+  id_usuario: number;
+  nombre: string;
+  correo: string;
+  activo: boolean;
+  id_rol: number;
+  rol: string;
+};
+
+export type PermisoUsuario = {
+  clave: string;
+  nombre: string;
+};
+
+export type UsuarioAutenticado = {
+  id_usuario: number;
+  nombre: string;
+  correo: string;
+  id_rol: number;
+  rol?: string;
+  activo: boolean;
+  permisos: PermisoUsuario[];
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+};
+
+export type LoginRespuesta = UsuarioAutenticado & {
+  usuario: Omit<UsuarioAutenticado, "access_token" | "token_type" | "expires_in">;
+};
+
+export type DetallePedidoCrear = {
+  id_producto: number;
+  cantidad: number;
+  observaciones?: string | null;
+};
+
+export type PedidoCrear = {
+  id_mesa: number;
+  id_mesero: number;
+  productos: DetallePedidoCrear[];
+};
+
+export type PedidoCreado = {
+  id_pedido: number;
+  id_mesa: number;
+  id_mesero: number;
+  fecha_hora: string;
   estado: string;
   total: number;
 };
