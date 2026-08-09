@@ -41,6 +41,17 @@ def listar_pedidos_cocina(
             """,
             {"id_pedido": pedido["id_pedido"]},
         )
+        for item in pedido["detalle"]:
+            item["personalizaciones"] = listar_diccionarios(
+                sesion,
+                """
+                SELECT id_opcion, nombre_grupo, nombre_opcion, precio_adicional
+                FROM detalle_pedido_modificador
+                WHERE id_detalle = :id_detalle
+                ORDER BY id_detalle_modificador
+                """,
+                {"id_detalle": item["id_detalle"]},
+            )
     return pedidos
 
 

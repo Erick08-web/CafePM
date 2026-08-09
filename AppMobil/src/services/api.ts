@@ -1,6 +1,6 @@
 import { obtenerTokenLocal } from "@/services/session-storage";
 
-// Prefer EXPO_PUBLIC_API_BASE_URL for real devices. The local fallback is kept
+// Prefer EXPO_PUBLIC_API_BASE_URL for phones. The local fallback is kept
 // for simulator/web development on the same machine as ApiBackend.
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
 

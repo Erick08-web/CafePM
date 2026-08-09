@@ -13,6 +13,34 @@ export type Producto = {
   activo?: boolean;
 };
 
+export type PersonalizacionSeleccionada = {
+  id_opcion: number;
+  nombre_grupo: string;
+  nombre_opcion: string;
+  precio_adicional: number;
+};
+
+export type OpcionModificador = {
+  id_opcion: number;
+  nombre: string;
+  precio_adicional: number;
+  es_default: boolean;
+};
+
+export type GrupoModificador = {
+  id_grupo: number;
+  clave: string;
+  nombre: string;
+  tipo_seleccion: "single" | "multi";
+  obligatorio: boolean;
+  opciones: OpcionModificador[];
+};
+
+export type PersonalizacionesProducto = {
+  producto: Producto;
+  grupos: GrupoModificador[];
+};
+
 export type PedidoCocina = {
   id_pedido: number;
   id_mesa?: number | null;
@@ -25,6 +53,7 @@ export type PedidoCocina = {
     nombre: string;
     cantidad: number;
     observaciones?: string | null;
+    personalizaciones?: PersonalizacionSeleccionada[];
   }>;
 };
 
@@ -62,6 +91,7 @@ export type DetallePedido = {
   precio_unitario: number;
   subtotal: number;
   observaciones?: string | null;
+  personalizaciones?: PersonalizacionSeleccionada[];
 };
 
 export type PedidoDetalle = {
@@ -130,6 +160,7 @@ export type DetallePedidoCrear = {
   id_producto: number;
   cantidad: number;
   observaciones?: string | null;
+  modificadores?: number[];
 };
 
 export type PedidoCrear = {

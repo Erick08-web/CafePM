@@ -17,10 +17,10 @@ export default function Layout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "Coffee Code", headerShown: false }} />
-        <Stack.Screen name="mesero" options={{ title: "Mesero" }} />
-        <Stack.Screen name="cocina" options={{ title: "Cocina" }} />
-        <Stack.Screen name="caja" options={{ title: "Caja" }} />
-        <Stack.Screen name="admin" options={{ title: "Administrador" }} />
+        <Stack.Screen name="mesero" options={{ headerShown: false }} />
+        <Stack.Screen name="cocina" options={{ headerShown: false }} />
+        <Stack.Screen name="caja" options={{ headerShown: false }} />
+        <Stack.Screen name="admin" options={{ headerShown: false }} />
       </Stack>
     </AuthProvider>
   );

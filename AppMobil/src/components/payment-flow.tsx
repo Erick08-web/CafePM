@@ -148,6 +148,16 @@ export function PaymentSummary({ cuenta, detalle, metodo, processing = false, on
           <Text selectable style={{ color: colors.textoSuave, fontWeight: "700" }}>
             Unitario {money(Number(item.precio_unitario))}
           </Text>
+          {item.personalizaciones?.length ? (
+            <View style={{ gap: 2 }}>
+              {item.personalizaciones.map((opcion) => (
+                <Text key={`${item.id_detalle}-${opcion.id_opcion}`} selectable style={{ color: colors.textoSuave, fontWeight: "700", lineHeight: 18 }}>
+                  {opcion.nombre_opcion}
+                  {Number(opcion.precio_adicional) > 0 ? ` +${money(Number(opcion.precio_adicional))}` : ""}
+                </Text>
+              ))}
+            </View>
+          ) : null}
           {item.observaciones ? (
             <Text selectable style={{ color: colors.cafe, fontWeight: "700", lineHeight: 19 }}>
               Obs: {item.observaciones}

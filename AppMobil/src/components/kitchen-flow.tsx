@@ -120,6 +120,15 @@ export function OrderItemsList({ pedido }: OrderItemsListProps) {
               </Text>
             </View>
           ) : null}
+          {item.personalizaciones?.length ? (
+            <View style={{ gap: 3, paddingLeft: 42 }}>
+              {item.personalizaciones.map((opcion) => (
+                <Text key={`${item.id_detalle}-${opcion.id_opcion}`} selectable style={{ color: colors.textoSuave, fontWeight: "800", lineHeight: 18 }}>
+                  {opcion.nombre_opcion}
+                </Text>
+              ))}
+            </View>
+          ) : null}
         </View>
       ))}
     </View>
@@ -183,7 +192,7 @@ export function KitchenOrderCard({ pedido, updating = false, onAdvance }: Kitche
         >
           <MaterialCommunityIcons name="check-circle-outline" size={20} color={colors.verde} />
           <Text selectable style={{ color: colors.verde, flex: 1, fontWeight: "900" }}>
-            Listo para el siguiente modulo
+            Listo para caja
           </Text>
         </View>
       )}

@@ -21,7 +21,7 @@ export function SessionBar() {
     router.replace("/");
   }
 
-  const permisoPrincipal = usuario.rol ?? usuario.permisos[0]?.nombre ?? "Sin modulo asignado";
+  const permisoPrincipal = usuario.rol ?? usuario.permisos[0]?.nombre ?? "Sin rol asignado";
 
   return (
     <AppCard compact>

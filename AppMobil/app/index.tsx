@@ -72,18 +72,18 @@ export default function InicioSesion() {
             <MaterialCommunityIcons name="coffee" size={42} color={colors.textoInvertido} />
           </View>
           <View style={{ alignItems: "center", gap: spacing.xs }}>
-            <StatusBadge label="Coffee Code / CafePM" tone="success" />
+            <StatusBadge label="Coffee Code" tone="success" />
             <Text selectable style={{ color: colors.texto, fontSize: typography.hero, fontWeight: "900", lineHeight: 40 }}>
               Bienvenido
             </Text>
             <Text selectable style={{ color: colors.textoSuave, fontSize: typography.bodyLarge, fontWeight: "700", textAlign: "center" }}>
-              Administracion de cafeteria con una experiencia movil limpia y profesional.
+              Inicia sesion para comenzar.
             </Text>
           </View>
         </View>
 
         <AppCard style={{ gap: spacing.lg }}>
-          {cargandoSesion ? <LoadingState title="Recuperando sesion" message="Estamos verificando si ya tienes una sesion activa." /> : null}
+          {cargandoSesion ? <LoadingState title="Recuperando sesion" message="Validando tu acceso." /> : null}
           {error ? <StatusBadge label={error} tone="danger" /> : null}
 
           <AppInput
@@ -120,10 +120,6 @@ export default function InicioSesion() {
 
           <AppButton disabled={enviando || cargandoSesion} fullWidth icon="login" onPress={handleLogin} title={enviando ? "Verificando..." : "Iniciar sesion"} />
         </AppCard>
-
-        <Text selectable style={{ color: colors.textoSuave, fontSize: typography.caption, fontWeight: "700", textAlign: "center" }}>
-          Sistema de cafeteria - UPQ 2026
-        </Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

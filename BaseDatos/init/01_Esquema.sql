@@ -84,6 +84,48 @@ CREATE TABLE receta (
     UNIQUE (id_producto, id_insumo)
 );
 
+CREATE TABLE grupos_modificador (
+    id_grupo SERIAL PRIMARY KEY,
+    clave VARCHAR(50) NOT NULL UNIQUE,
+    nombre VARCHAR(80) NOT NULL,
+    tipo_seleccion VARCHAR(10) NOT NULL CHECK (tipo_seleccion IN ('single', 'multi')),
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    orden INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE opciones_modificador (
+    id_opcion SERIAL PRIMARY KEY,
+    id_grupo INT NOT NULL REFERENCES grupos_modificador(id_grupo) ON DELETE CASCADE,
+    nombre VARCHAR(80) NOT NULL,
+    precio_adicional NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (precio_adicional >= 0),
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    orden INT NOT NULL DEFAULT 0,
+    UNIQUE (id_grupo, nombre)
+);
+
+CREATE TABLE producto_grupo_modificador (
+    id_producto INT NOT NULL REFERENCES productos(id_producto) ON DELETE CASCADE,
+    id_grupo INT NOT NULL REFERENCES grupos_modificador(id_grupo) ON DELETE CASCADE,
+    obligatorio BOOLEAN NOT NULL DEFAULT FALSE,
+    orden INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (id_producto, id_grupo)
+);
+
+CREATE TABLE producto_opcion_modificador (
+    id_producto INT NOT NULL REFERENCES productos(id_producto) ON DELETE CASCADE,
+    id_opcion INT NOT NULL REFERENCES opciones_modificador(id_opcion) ON DELETE CASCADE,
+    es_default BOOLEAN NOT NULL DEFAULT FALSE,
+    orden INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (id_producto, id_opcion)
+);
+
+CREATE TABLE opcion_modificador_inventario (
+    id_opcion INT NOT NULL REFERENCES opciones_modificador(id_opcion) ON DELETE CASCADE,
+    id_insumo INT NOT NULL REFERENCES inventario(id_insumo) ON DELETE RESTRICT,
+    cantidad_adicional NUMERIC(10,2) NOT NULL CHECK (cantidad_adicional > 0),
+    PRIMARY KEY (id_opcion, id_insumo)
+);
+
 CREATE TABLE proveedores (
     id_proveedor SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -129,6 +171,15 @@ CREATE TABLE detalle_pedido (
     observaciones TEXT
 );
 
+CREATE TABLE detalle_pedido_modificador (
+    id_detalle_modificador SERIAL PRIMARY KEY,
+    id_detalle INT NOT NULL REFERENCES detalle_pedido(id_detalle) ON DELETE CASCADE,
+    id_opcion INT REFERENCES opciones_modificador(id_opcion) ON DELETE SET NULL,
+    nombre_grupo VARCHAR(80) NOT NULL,
+    nombre_opcion VARCHAR(80) NOT NULL,
+    precio_adicional NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (precio_adicional >= 0)
+);
+
 CREATE TABLE pagos (
     id_pago SERIAL PRIMARY KEY,
     id_pedido INT NOT NULL UNIQUE REFERENCES pedidos(id_pedido),
@@ -159,6 +210,7 @@ CREATE TABLE gastos (
 CREATE INDEX idx_pedidos_estado ON pedidos(estado);
 CREATE INDEX idx_pedidos_fecha ON pedidos(fecha_hora);
 CREATE INDEX idx_detalle_pedido ON detalle_pedido(id_pedido);
+CREATE INDEX idx_detalle_modificador_detalle ON detalle_pedido_modificador(id_detalle);
 CREATE INDEX idx_gastos_fecha ON gastos(fecha_gasto);
 CREATE INDEX idx_compras_fecha ON compras(fecha_compra);
 CREATE INDEX idx_movimientos_insumo ON movimientos_inventario(id_insumo);
@@ -253,6 +305,13 @@ BEGIN
     SELECT r.id_insumo, 'salida', r.cantidad_necesaria * dp.cantidad, NEW.id_pedido
     FROM detalle_pedido dp
     JOIN receta r ON r.id_producto = dp.id_producto
+    WHERE dp.id_pedido = NEW.id_pedido;
+
+    INSERT INTO movimientos_inventario (id_insumo, tipo_movimiento, cantidad, id_pedido)
+    SELECT omi.id_insumo, 'salida', omi.cantidad_adicional * dp.cantidad, NEW.id_pedido
+    FROM detalle_pedido dp
+    JOIN detalle_pedido_modificador dpm ON dpm.id_detalle = dp.id_detalle
+    JOIN opcion_modificador_inventario omi ON omi.id_opcion = dpm.id_opcion
     WHERE dp.id_pedido = NEW.id_pedido;
 
     UPDATE inventario i
